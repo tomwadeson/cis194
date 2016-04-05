@@ -2,6 +2,7 @@
 module Golf where
 
 import Data.List (tails)
+import qualified Data.Map.Strict as M
 
 skips :: [a] -> [[a]]
 skips = skips' 1
@@ -18,4 +19,8 @@ localMaxima = concatMap lm . filter (\x -> length x == 3) . map (take 3) . tails
       | otherwise      = []
 
 histogram :: [Integer] -> String
-histogram = undefined
+histogram = show . map (\xs -> map (\x -> if x `elem` xs then '*' else ' ') [0..9]) . mkRows 0 . foldr (\x acc -> M.insertWith (+) x 1 acc) M.empty
+  where
+    mkRows n hist
+      | n <= 9    = (M.keys . M.filter (>= n) $ hist) : mkRows (n+1) hist 
+      | otherwise = []
