@@ -19,3 +19,25 @@ fun2 n | even n    = n + fun2 (n `div` 2)
 fun2' :: Integer -> Integer
 fun2' = sum . filter even . takeWhile (/= 1) . iterate 
   (\x -> if even x then x `div` 2 else 3 * x + 1)
+
+data Tree a = Leaf
+            | Node Integer (Tree a) a (Tree a)
+  deriving (Show, Eq)
+
+foldTree :: [a] -> Tree a
+foldTree = foldl (\acc x -> insert x acc) Leaf
+
+mkNode :: a -> Integer -> Tree a
+mkNode x h = Node h Leaf x Leaf
+
+insert :: a -> Tree a -> Tree a
+insert x Leaf                    = mkNode x 0
+insert x (Node h Leaf val right) = Node h (mkNode x (h+1)) val right
+insert x (Node h left val Leaf)  = Node h left val (mkNode x (h+1))
+insert x (Node h left val right)
+  | maxHeight left <= maxHeight right = Node h (insert x left) val right
+  | otherwise                         = Node h left val (insert x right)
+
+maxHeight :: Tree a -> Integer
+maxHeight Leaf                  = 0
+maxHeight (Node h left _ right) = maximum [h, (maxHeight left), (maxHeight right)]
