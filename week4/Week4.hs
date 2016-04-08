@@ -40,4 +40,18 @@ insert x (Node h left val right)
 
 maxHeight :: Tree a -> Integer
 maxHeight Leaf                  = 0
-maxHeight (Node h left _ right) = maximum [h, (maxHeight left), (maxHeight right)]
+maxHeight (Node h left _ right) = maximum [h, maxHeight left, maxHeight right]
+
+xor :: [Bool] -> Bool
+xor = foldl xor' False
+
+xor' :: Bool -> Bool -> Bool
+xor' True False = True
+xor' False True = True
+xor' _ _        = False
+
+map' :: (a -> b) -> [a] -> [b]
+map' f = foldr ((:) . f) []
+
+foldl' :: (a -> b -> a) -> a -> [b] -> a
+foldl' f base xs = foldr (flip f) base $ reverse xs
