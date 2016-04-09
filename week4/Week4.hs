@@ -25,7 +25,7 @@ data Tree a = Leaf
   deriving (Show, Eq)
 
 foldTree :: [a] -> Tree a
-foldTree = foldl (\acc x -> insert x acc) Leaf
+foldTree = foldl (flip insert) Leaf
 
 mkNode :: a -> Integer -> Tree a
 mkNode x h = Node h Leaf x Leaf
