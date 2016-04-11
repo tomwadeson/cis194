@@ -2,6 +2,8 @@
 
 module Week4 where
 
+import Data.List ((\\))
+
 fun1 :: [Integer] -> Integer
 fun1 []       = 1
 fun1 (x:xs)
@@ -55,3 +57,7 @@ map' f = foldr ((:) . f) []
 
 foldl' :: (a -> b -> a) -> a -> [b] -> a
 foldl' f base xs = foldr (flip f) base $ reverse xs
+
+sieveSundaram :: Integer -> [Integer]
+sieveSundaram n = map (\x -> x*2+1) $ 
+  [1..n] \\ [ x | i <- [1..n], j <- [1..n], let x = i+j+2*i*j, 1 <= i, i <= j, x <= n ]
