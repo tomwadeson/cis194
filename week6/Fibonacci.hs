@@ -9,4 +9,9 @@ fib n | n >= 2 = fib (n-1) + fib (n-2)
 fib _ = 0
 
 fibs1 :: [Integer]
-fibs1 = map fib [1..]
+fibs1 = map fib [0..]
+
+fibs2 :: [Integer]
+fibs2 = fib 0 1
+  where
+    fib x y = x : fib y (x+y)
