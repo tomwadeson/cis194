@@ -2,6 +2,8 @@
 
 module Stream where
 
+import Data.List (intersperse)
+
 data Stream a = Cons a (Stream a)
   deriving Eq
 
@@ -19,3 +21,12 @@ streamMap f (Cons x xs) = Cons (f x) (streamMap f xs)
 
 streamFromSeed :: (a -> a) -> a -> Stream a
 streamFromSeed f x = Cons x (streamFromSeed f (f x))
+
+nats :: Stream Integer
+nats = streamFromSeed (+1) 0
+
+ruler :: Stream Integer
+ruler = undefined
+
+interleaveStreams :: Stream a -> Stream a -> Stream a
+interleaveStreams (Cons x xs) (Cons y ys) = Cons x (Cons y (interleaveStreams xs ys))
