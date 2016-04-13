@@ -1,9 +1,12 @@
 {-# OPTIONS_GHC -Wall #-}
+{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module Calc where
 
 import ExprT
 import Parser
+import qualified StackVM as S
 
 newtype MinMax = MinMax Integer deriving (Eq, Show)
 newtype Mod7   = Mod7 Integer deriving (Eq, Show)
@@ -60,3 +63,11 @@ testMM = testExp
 
 testSat :: Maybe Mod7
 testSat = testExp
+
+instance Expr S.Program where
+  lit x   = [S.PushI x]
+  add x y = x ++ y ++ [S.Add]
+  mul x y = x ++ y ++ [S.Mul]
+
+compile :: String -> Maybe S.Program
+compile = parseExp lit add mul
