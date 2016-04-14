@@ -1,4 +1,4 @@
-{-# OPTIONS_GHC -Wall #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module Fibonacci where
 
@@ -42,3 +42,15 @@ ruler = undefined
 
 interleaveStreams :: Stream a -> Stream a -> Stream a
 interleaveStreams (Cons x xs) (Cons y ys) = Cons x (Cons y (interleaveStreams xs ys))
+
+x :: Stream Integer
+x = Cons 0 (Cons 1 $ streamRepeat 0)
+
+instance Num (Stream Integer) where
+  fromInteger n = Cons n $ streamRepeat 0
+
+  negate = streamMap (* (-1))
+
+  (+) (Cons x xs) (Cons y ys) = Cons (x + y) (xs + ys)
+
+  (*) (Cons x xs) y'@(Cons y ys) = Cons (x * y) $ streamMap (*x) ys + (xs * y')
