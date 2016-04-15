@@ -54,3 +54,18 @@ instance Num (Stream Integer) where
   (+) (Cons x xs) (Cons y ys) = Cons (x + y) (xs + ys)
 
   (*) (Cons x xs) y'@(Cons y ys) = Cons (x * y) $ streamMap (*x) ys + (xs * y')
+
+data Matrix = Matrix Integer Integer Integer Integer
+  deriving (Eq, Show)
+
+instance Num Matrix where
+  (*) (Matrix a b c d) (Matrix e f g h) = let a' = a * e + b * g 
+                                              b' = a * f + b * h
+                                              c' = c * e + d * g
+                                              d' = c * f + d * h
+                                          in  Matrix a' b' c' d'
+
+fib4 :: Integer -> Integer
+fib4 n = let (Matrix _ _ x _) = matrix^n in x
+  where
+    matrix = Matrix 1 1 1 0
