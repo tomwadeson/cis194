@@ -33,3 +33,13 @@ jToList :: JoinList m a -> [a]
 jToList Empty            = []
 jToList (Single _ x)     = [x]
 jToList (Append _ l1 l2) = jToList l1 ++ jToList l2
+
+m =
+  Append (Size 3)
+         (Single (Size 1) "Hello")
+         (Single (Size 1) "World")
+
+n =
+  Append (Size 4)
+         (Single (Size 1) "Greeting:")
+         m
