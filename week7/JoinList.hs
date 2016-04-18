@@ -29,6 +29,32 @@ indexJ index (Append s l1 l2)
     size0 = getSize . size $ s
     size1 = getSize . size . tag $ l1
 
+dropJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
+dropJ _ Empty = Empty
+dropJ n l1@(Single _ _)
+  | n <= 0 = l1
+dropJ n l0@(Append m l1 l2)
+  | n >= size0 = Empty
+  | n >= size1 = dropJ (n-size1) l2
+  | n > 0      = dropJ n l1 ++++ l2
+  | otherwise  = l0
+  where
+    size0 = getSize . size $ m
+    size1 = getSize . size . tag $ l1
+
+takeJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
+takeJ _ Empty = Empty
+takeJ 0 _     = Empty
+takeJ n l1@(Single _ _)
+  | n >= 1 = l1
+takeJ n l0@(Append m l1 l2)
+  | n >= size0 = l0
+  | n < size1  = takeJ n l1
+  | n >= size1 = l1 ++++ takeJ (n - size1) l2
+  where
+    size0 = getSize . size $ m
+    size1 = getSize . size . tag $ l1
+
 (!!?) :: [a] -> Int -> Maybe a
 []     !!? _         = Nothing
 _      !!? i | i < 0 = Nothing
@@ -40,12 +66,12 @@ jToList Empty            = []
 jToList (Single _ x)     = [x]
 jToList (Append _ l1 l2) = jToList l1 ++ jToList l2
 
-m =
+p =
   Append (Size 2)
          (Single (Size 1) "Hello")
          (Single (Size 1) "World")
 
-n =
+q =
   Append (Size 3)
          (Single (Size 1) "Greeting:")
-         m
+         p
