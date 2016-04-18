@@ -22,3 +22,14 @@ indexJ n x@(Single _ y) = if (n == (getSize . size . tag $ x)) then (Just y) els
 indexJ n x@(Append _ l r)
   | n <  (getSize . size . tag $ x) = indexJ n l
   | n >  (getSize . size . tag $ x) = indexJ n r
+
+(!!?) :: [a] -> Int -> Maybe a
+[]     !!? _         = Nothing
+_      !!? i | i < 0 = Nothing
+(x:xs) !!? 0         = Just x
+(x:xs) !!? i         = xs !!? (i-1)
+
+jToList :: JoinList m a -> [a]
+jToList Empty            = []
+jToList (Single _ x)     = [x]
+jToList (Append _ l1 l2) = jToList l1 ++ jToList l2
