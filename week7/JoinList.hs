@@ -55,6 +55,27 @@ takeJ n l0@(Append m l1 l2)
     size0 = getSize . size $ m
     size1 = getSize . size . tag $ l1
 
+takeJ' :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
+takeJ' n = foldJ Empty single append
+  where
+    single m l1    = if n >= 1 then Single m l1 else Empty
+    append m l1 l2
+      | n >= size0 = Append m l1 l2
+      | n <  size1 = takeJ' n l1
+      | n >= size1 = l1 ++++ takeJ' (n - size1) l2
+      where
+        size0 = getSize . size $ m
+        size1 = getSize . size . tag $ l1
+
+foldJ :: c 
+      -> (a -> b -> c) 
+      -> (a -> c -> c -> c) 
+      -> JoinList a b 
+      -> c
+foldJ e _ _ Empty            = e
+foldJ _ f _ (Single m l1)    = f m l1
+foldJ e f g (Append m l1 l2) = g m (foldJ e f g l1) (foldJ e f g l2)
+
 (!!?) :: [a] -> Int -> Maybe a
 []     !!? _         = Nothing
 _      !!? i | i < 0 = Nothing
