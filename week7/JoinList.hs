@@ -14,8 +14,8 @@ tag Empty          = mempty
 tag (Single m _)   = m
 tag (Append m _ _) = m
 
-(++++) :: Monoid m => JoinList m a -> JoinList m a -> JoinList m a
-(++++) x y = Append (tag x <> tag y) x y
+(+++) :: Monoid m => JoinList m a -> JoinList m a -> JoinList m a
+(+++) x y = Append (tag x <> tag y) x y
 
 indexJ :: (Sized b, Monoid b) => Int -> JoinList b a -> Maybe a
 indexJ _ Empty = Nothing
@@ -37,7 +37,7 @@ dropJ n l1@(Single _ _)
 dropJ n l0@(Append m l1 l2)
   | n >= size0 = Empty
   | n >= size1 = dropJ (n-size1) l2
-  | n > 0      = dropJ n l1 ++++ l2
+  | n > 0      = dropJ n l1 +++ l2
   | otherwise  = l0
   where
     size0 = getSize . size $ m
@@ -51,7 +51,7 @@ takeJ n l1@(Single _ _)
 takeJ n l0@(Append m l1 l2)
   | n >= size0 = l0
   | n < size1  = takeJ n l1
-  | n >= size1 = l1 ++++ takeJ (n - size1) l2
+  | n >= size1 = l1 +++ takeJ (n - size1) l2
   where
     size0 = getSize . size $ m
     size1 = getSize . size . tag $ l1
@@ -63,7 +63,7 @@ takeJ' n = foldJ Empty single append
     append m l1 l2
       | n >= size0 = Append m l1 l2
       | n <  size1 = takeJ' n l1
-      | n >= size1 = l1 ++++ takeJ' (n - size1) l2
+      | n >= size1 = l1 +++ takeJ' (n - size1) l2
       where
         size0 = getSize . size $ m
         size1 = getSize . size . tag $ l1
@@ -80,7 +80,7 @@ foldJ e f g (Append m l1 l2) = g m (foldJ e f g l1) (foldJ e f g l2)
 scoreLine :: String -> JoinList Score String
 scoreLine s = Single (scoreString s) s
 
-scrabble = scoreLine "yay " ++++ scoreLine "haskell!"
+scrabble = scoreLine "yay " +++ scoreLine "haskell!"
 
 (!!?) :: [a] -> Int -> Maybe a
 []     !!? _         = Nothing
