@@ -2,6 +2,7 @@ module JoinList where
 
 import Data.Monoid ((<>))
 import Sized
+import Scrabble
 
 data JoinList m a = Empty
                   | Single m a
@@ -75,6 +76,11 @@ foldJ :: c
 foldJ e _ _ Empty            = e
 foldJ _ f _ (Single m l1)    = f m l1
 foldJ e f g (Append m l1 l2) = g m (foldJ e f g l1) (foldJ e f g l2)
+
+scoreLine :: String -> JoinList Score String
+scoreLine s = Single (scoreString s) s
+
+scrabble = scoreLine "yay " ++++ scoreLine "haskell!"
 
 (!!?) :: [a] -> Int -> Maybe a
 []     !!? _         = Nothing
