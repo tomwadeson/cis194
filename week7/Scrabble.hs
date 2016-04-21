@@ -3,7 +3,7 @@ module Scrabble where
 import Data.Monoid
 import Data.Char (toUpper)
 
-newtype Score = Score Int
+newtype Score = Score { getScore :: Int }
   deriving (Eq, Show)
 
 instance Monoid Score where
