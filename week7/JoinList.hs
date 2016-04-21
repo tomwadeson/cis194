@@ -1,8 +1,11 @@
+{-# LANGUAGE FlexibleInstances #-}
+
 module JoinList where
 
 import Data.Monoid ((<>))
 import Sized
 import Scrabble
+import Buffer
 
 data JoinList m a = Empty
                   | Single m a
@@ -80,7 +83,18 @@ foldJ e f g (Append m l1 l2) = g m (foldJ e f g l1) (foldJ e f g l2)
 scoreLine :: String -> JoinList Score String
 scoreLine s = Single (scoreString s) s
 
+scoreSizeLine :: String -> JoinList (Score, Size) String
+scoreSizeLine s = Single (scoreString s, 1) s
+
 scrabble = scoreLine "yay " +++ scoreLine "haskell!"
+
+instance Buffer (JoinList (Score, Size) String) where
+  toString             = unlines . jToList
+  fromString           = foldl1 (+++) . map scoreSizeLine . lines
+  line                 = indexJ
+  replaceLine n ln buf = takeJ' n buf +++ scoreSizeLine ln +++ dropJ (n+1) buf
+  numLines             = getSize . snd . tag
+  value                = getScore . fst . tag
 
 (!!?) :: [a] -> Int -> Maybe a
 []     !!? _         = Nothing
@@ -102,3 +116,9 @@ q =
   Append (Size 3)
          (Single (Size 1) "Greeting:")
          p
+
+r = foldl1 (+++) . map scoreSizeLine $
+  [ "This is a line"
+  , "This is another line"
+  , "Hello, World!"
+  , "... and so on." ]
