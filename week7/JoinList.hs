@@ -6,6 +6,7 @@ import Data.Monoid ((<>))
 import Sized
 import Scrabble
 import Buffer
+import Editor
 
 data JoinList m a = Empty
                   | Single m a
@@ -95,6 +96,9 @@ instance Buffer (JoinList (Score, Size) String) where
   replaceLine n ln buf = takeJ' n buf +++ scoreSizeLine ln +++ dropJ (n+1) buf
   numLines             = getSize . snd . tag
   value                = getScore . fst . tag
+
+main :: IO ()
+main = runEditor editor $ scoreSizeLine "Hello, World!"
 
 (!!?) :: [a] -> Int -> Maybe a
 []     !!? _         = Nothing
