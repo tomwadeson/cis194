@@ -71,3 +71,12 @@ instance Applicative Parser where
     Parser $ \s -> case runParser p1 s of
       Nothing       -> Nothing
       Just (f, rem) -> first f <$> runParser p2 rem
+
+abParser :: Parser (Char, Char)
+abParser = (,) <$> char 'a' <*> char 'b'
+
+abParser_ :: Parser ()
+abParser_ = char 'a' *> char 'b' *> pure ()
+
+intPair :: Parser [Integer]
+intPair = (\x y -> [x,y]) <$> posInt <* char ' ' <*> posInt 
