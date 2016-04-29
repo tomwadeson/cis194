@@ -45,3 +45,15 @@ data Atom = N Integer | I Ident
 data SExpr = A Atom
            | Comb [SExpr]
   deriving Show
+
+atom :: Parser Atom
+atom = liftA N posInt <|> liftA I ident
+
+parseSExpr :: Parser SExpr
+parseSExpr = strip $ liftA A atom <|> liftA Comb (parens (oneOrMore parseSExpr))
+
+parens :: Parser a -> Parser a
+parens p = char '(' *> p <* char ')'
+
+strip :: Parser a -> Parser a
+strip p = spaces *> p <* spaces
