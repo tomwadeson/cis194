@@ -31,12 +31,26 @@ dice n = replicateM n die
 type Army = Int
 
 data Battlefield = Battlefield { attackers :: Army, defenders :: Army }
+  deriving (Show)
 
 battle :: Battlefield -> Rand StdGen Battlefield
-battle bf = undefined
+battle bf = rollFor bf >>= \rolls -> return $ runBattle bf rolls
+
+runBattle :: Battlefield -> [(DieValue, DieValue)] -> Battlefield
+runBattle (Battlefield att def) rolls = Battlefield att' def'
+  where
+    (att', def') = foldl (\(att', def') (a, d) -> if a > d then (att', def'-1) else (att'-1, def'))
+                     (att, def) rolls
 
 rollFor :: Battlefield -> Rand StdGen [(DieValue, DieValue)]
-rollFor bf = let attackerRolls = dice $ attackers bf
-                 defenderRolls = dice $ defenders bf
+rollFor bf = let (attArmy, defArmy) = units bf
+                 attackerRolls      = dice attArmy
+                 defenderRolls      = dice defArmy
              in  attackerRolls >>= \ar ->
                  defenderRolls >>= \dr -> return $ zip (sort ar) (sort dr)
+
+units :: Battlefield -> (Army, Army)
+units (Battlefield att def) =
+  let att' = if att > 1 then min (att - 1) 3 else 1
+      def' = min def 2
+  in  (att', def')
