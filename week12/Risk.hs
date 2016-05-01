@@ -54,3 +54,7 @@ units (Battlefield att def) =
   let att' = if att > 1 then min (att - 1) 3 else 1
       def' = min def 2
   in  (att', def')
+
+invade :: Battlefield -> Rand StdGen Battlefield
+invade bf = battle bf >>= \bf' ->
+  if defenders bf' == 0 || attackers bf' < 2 then return bf' else invade bf'
