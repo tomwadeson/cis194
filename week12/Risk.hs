@@ -58,3 +58,11 @@ units (Battlefield att def) =
 invade :: Battlefield -> Rand StdGen Battlefield
 invade bf = battle bf >>= \bf' ->
   if defenders bf' == 0 || attackers bf' < 2 then return bf' else invade bf'
+
+successProb :: Battlefield -> Rand StdGen Double
+successProb bf = replicateM 1000 (invade bf) >>= success
+
+success :: [Battlefield] -> Rand StdGen Double
+success bfs = return $ fromIntegral attackerWins / fromIntegral (length bfs)
+  where
+    attackerWins = length . filter (== 0) . map defenders $ bfs
